@@ -30,6 +30,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.app.StatusBarManager;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -86,6 +87,8 @@ public class SmartBarView extends BaseNavigationBar {
         sUris.add(Settings.Secure.getUriFor("smartbar_ime_hint_mode"));
         sUris.add(Settings.Secure.getUriFor("smartbar_button_animation_style"));
         sUris.add(Settings.Secure.getUriFor(Settings.Secure.NAVBAR_BUTTONS_ALPHA));
+        sUris.add(Settings.System.getUriFor(Settings.System.NAV_BAR_ICON_COLOR));
+        sUris.add(Settings.System.getUriFor(Settings.System.NAV_BAR_RIPPLE_COLOR));
     }
 
     private SmartObservable mObservable = new SmartObservable() {
@@ -105,6 +108,11 @@ public class SmartBarView extends BaseNavigationBar {
                 updateAnimationStyle();
             } else if (uri.equals(Settings.Secure.getUriFor(Settings.Secure.NAVBAR_BUTTONS_ALPHA))) {
                 updateButtonAlpha();
+            } else if (uri.equals(Settings.System.getUriFor(Settings.System.NAV_BAR_ICON_COLOR))) {
+                updateCurrentIcons();
+            /*} else if (uri.equals(Settings.System.getUriFor(Settings.System.NAV_BAR_RIPPLE_COLOR))) {
+                SmartButtonRipple background = (SmartButtonRipple) getBackground();
+                background.updateRipple();*/
             }
         }
     };
@@ -122,6 +130,7 @@ public class SmartBarView extends BaseNavigationBar {
     private int mImeHintMode;
     private int mButtonAnimationStyle;
     private float mCustomAlpha;
+    public static int mButtonColor;
 
     public SmartBarView(Context context, boolean asDefault) {
         super(context);
@@ -198,6 +207,8 @@ public class SmartBarView extends BaseNavigationBar {
     public void setButtonDrawable(SmartButtonView button) {
         ButtonConfig config = button.getButtonConfig();
         Drawable d = null;
+        mButtonColor = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.NAV_BAR_ICON_COLOR, 0xffffffff);
         if (config != null) {
             // a system navigation action icon is showing, get it locally
             if (!config.hasCustomIcon()
@@ -217,6 +228,8 @@ public class SmartBarView extends BaseNavigationBar {
                 button.setImageDrawable(null);
                 button.setImageDrawable(d);
             }
+            button.setImageTintList(ColorStateList.valueOf(mButtonColor));
+            SmartBackButtonDrawable.updateColor();
         }
     }
 
@@ -692,5 +705,9 @@ public class SmartBarView extends BaseNavigationBar {
                 .alpha(fadeAlpha)
                 .setDuration(PULSE_FADE_IN_DURATION)
                 .start();
+    }
+
+    public static int getButtonColor() {
+        return mButtonColor;
     }
 }

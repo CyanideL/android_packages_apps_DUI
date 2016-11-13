@@ -22,6 +22,7 @@ import android.animation.Animator;
 import android.animation.ObjectAnimator;
 import android.annotation.NonNull;
 import android.app.ActivityManager;
+import android.content.res.ColorStateList;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Rect;
@@ -30,7 +31,7 @@ import android.util.FloatProperty;
 import android.util.Property;
 
 public class SmartBackButtonDrawable extends Drawable {
-    private final Drawable mWrappedDrawable;
+    private static Drawable mWrappedDrawable;
     private float mRotation;
     private Animator mCurrentAnimator;
 
@@ -63,6 +64,7 @@ public class SmartBackButtonDrawable extends Drawable {
         canvas.translate(- boundsCenterX, - boundsCenterY);
 
         mWrappedDrawable.draw(canvas);
+        mWrappedDrawable.setTintList(ColorStateList.valueOf(SmartBarView.getButtonColor()));
     }
 
     @Override
@@ -138,5 +140,9 @@ public class SmartBackButtonDrawable extends Drawable {
         } else {
             setRotation(nextRotation);
         }
+    }
+
+    public static void updateColor() {
+        if (mWrappedDrawable != null) mWrappedDrawable.setTintList(ColorStateList.valueOf(SmartBarView.getButtonColor()));
     }
 }

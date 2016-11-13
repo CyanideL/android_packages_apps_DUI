@@ -27,6 +27,7 @@ import android.graphics.ColorFilter;
 import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
+import android.provider.Settings;
 import android.view.DisplayListCanvas;
 import android.view.RenderNodeAnimator;
 import android.view.View;
@@ -70,13 +71,15 @@ public class SmartButtonRipple extends Drawable {
 
     private int mRippleColor;
     private boolean mEnabled;
+    private Context mContext;
 
     public SmartButtonRipple(Context ctx, View targetView) {
-        final Context context = ctx;
-        mMaxWidth = context.getResources().getDimensionPixelSize(R.dimen.key_button_ripple_max_width);
+        mContext = ctx;
+        mMaxWidth = mContext.getResources().getDimensionPixelSize(R.dimen.key_button_ripple_max_width);
         mTargetView = targetView;
 //        mRippleColor = context.getResources().getColor(R.color.navbutton_ripple_color);
-        mRippleColor = Color.WHITE;
+        mRippleColor = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.NAV_BAR_RIPPLE_COLOR, 0xffffffff);
     }
 
     private Paint getRipplePaint() {
@@ -340,7 +343,7 @@ public class SmartButtonRipple extends Drawable {
         invalidateSelf();
     }
 
-    private void exitHardware() {
+    public void exitHardware() {
         mPaintProp = CanvasProperty.createPaint(getRipplePaint());
         final RenderNodeAnimator opacityAnim = new RenderNodeAnimator(mPaintProp,
                 RenderNodeAnimator.PAINT_ALPHA, 0);
